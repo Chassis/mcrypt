@@ -1,15 +1,16 @@
+# A Chassis extensions to add mcrypt to your Chassis server
 class mcrypt (
-	$path = "/vagrant/extensions/mcrypt",
-	$config
+	$config,
+	$path = '/vagrant/extensions/mcrypt'
 ) {
 
 	$php = $config[php]
 
-	if versioncmp( "${$php}", '5.4') <= 0 {
+	if versioncmp( $php, '5.4') <= 0 {
 		$php_package = 'php5'
 	}
 	else {
-		$php_package = "php$php"
+		$php_package = "php${$php}"
 	}
 
 	package { "${$php_package}-mcrypt":
