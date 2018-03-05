@@ -5,4 +5,3 @@ install:
 
 script:
   - puppet-lint --fail-on-warnings --no-2sp_soft_tabs-check --no-hard_tabs-check --no-names_containing_dash-check --no-autoloader_layout-check --no-nested_classes_or_defines-check modules
-s
