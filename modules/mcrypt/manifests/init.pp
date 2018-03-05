@@ -1,9 +1,9 @@
 class mcrypt (
 	$path = "/vagrant/extensions/mcrypt",
-	$mcrypt_config = sz_load_config(),
+	$config
 ) {
 
-	$php = $mcrypt_config[php]
+	$php = $config[php]
 
 	if versioncmp( "${$php}", '5.4') <= 0 {
 		$php_package = 'php5'
