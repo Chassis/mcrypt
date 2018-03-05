@@ -3,6 +3,11 @@ class mcrypt (
 	$config,
 	$path = '/vagrant/extensions/mcrypt'
 ) {
+	if ( ! empty( $::config[disabled_extensions] ) and 'chassis/mcrypt' in $config[disabled_extensions] ) {
+		$package = absent
+	} else {
+		$package = latest
+	}
 
 	$php = $config[php]
 
@@ -14,7 +19,7 @@ class mcrypt (
 	}
 
 	package { "${$php_package}-mcrypt":
-		ensure  => latest,
+		ensure  => $package,
 		require => Package["${$php_package}-fpm"],
 		notify  => Service["${$php_package}-fpm"]
 	}
