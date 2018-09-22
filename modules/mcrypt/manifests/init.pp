@@ -5,8 +5,10 @@ class mcrypt (
 ) {
 	if ( ! empty( $::config[disabled_extensions] ) and 'chassis/mcrypt' in $config[disabled_extensions] ) {
 		$package = absent
+		$file = absent
 	} else {
 		$package = latest
+		$file = present
 	}
 
 	$php = $config[php]
@@ -28,7 +30,7 @@ class mcrypt (
 		}
 
 		if ! defined( Package['libmcrypt-dev'] ) {
-			package { "libmcrypt-dev":
+			package { 'libmcrypt-dev':
 				ensure  => $package,
 				require => Package["php${config[php]}-dev"]
 			}
