@@ -21,7 +21,7 @@ class mcrypt (
 	}
 
 	# Mcyrpt isn't shipped in PHP 7.2 anymore but occasionally developers might need to still use it locally.
-	if versioncmp( $php, '5.4' ) >= 0 and versioncmp( $php, '7.1' ) >= 0 {
+	if versioncmp( $php, '5.4' ) >= 0 and versioncmp( $php, '7.2' ) >= 0 {
 		if ! defined( Package["php${config[php]}-dev"] ) {
 			package { "php${config[php]}-dev":
 				ensure  => $package,
