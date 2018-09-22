@@ -53,14 +53,14 @@ class mcrypt (
 			ensure  => $file,
 			content => template('mcrypt/mcrypt.ini.erb'),
 			notify  => Service["${$php_package}-fpm"],
-			require => 'pecl install mcrypt for PHP 7.2+',
+			require => Exec[ 'pecl install mcrypt for PHP 7.2+' ],
 		}
 
 		file { "/etc/php/${php}/fpm/conf.d/mcrypt.ini":
 			ensure  => $file,
 			content => template('mcrypt/mcrypt.ini.erb'),
 			notify  => Service["${$php_package}-fpm"],
-			require => 'pecl install mcrypt for PHP 7.2+',
+			require => Exec[ 'pecl install mcrypt for PHP 7.2+' ],
 		}
 
 	} else {
