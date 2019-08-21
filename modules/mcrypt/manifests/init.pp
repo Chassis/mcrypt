@@ -42,11 +42,26 @@ class mcrypt (
 			}
 		}
 
+		if ! defined( Exec['pecl channel-update pecl.php.net'] ) {
+			exec { 'pecl channel-update pecl.php.net':
+				path    => '/usr/bin',
+				require => [
+					Package['php-pear'],
+					Package["${php_package}-xml"],
+					Package["${php_package}-dev"],
+				]
+			}
+		}
+
 		exec { 'pecl install mcrypt for PHP 7.2+':
 			path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
-			command => 'pecl install mcrypt-1.0.1',
-			require => [ Package['php-pear'], Package["php${config[php]}-dev"] ],
-			unless  => 'pecl info mcrypt-1.0.1',
+			command => 'pecl install mcrypt-1.0.2',
+			require => [
+				Package['php-pear'],
+				Package["php${config[php]}-dev"],
+				Exec['pecl channel-update pecl.php.net'],
+			],
+			unless  => 'pecl info mcrypt-1.0.2',
 		}
 
 		file { "/etc/php/${php}/cli/conf.d/mcrypt.ini":
