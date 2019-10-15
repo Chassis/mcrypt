@@ -22,22 +22,18 @@ class mcrypt (
 
 	# Mcyrpt isn't shipped in PHP 7.2 anymore but occasionally developers might need to still use it locally.
 	if versioncmp( $php, '5.4' ) >= 0 and versioncmp( $php, '7.2' ) >= 0 {
-		if ! defined( Package["php${config[php]}-dev"] ) {
-			package { "${php_package}-dev":
-				ensure  => $package,
-				require => [
-					Apt::Ppa['ppa:ondrej/php'],
-					Class['apt::update'],
-				]
-			}
-		}
+		ensure_packages( [ "${php_package}-dev" ], {
+			ensure  => $package,
+			require => [
+				Apt::Ppa['ppa:ondrej/php'],
+				Class['apt::update'],
+			],
+		} )
 
-		if ! defined( Package['libmcrypt-dev'] ) {
-			package { 'libmcrypt-dev':
-				ensure  => $package,
-				require => Package["${php_package}-dev"]
-			}
-		}
+		ensure_packages( [ 'libmcrypt-dev' ], {
+			ensure  => $package,
+			require => Package["${php_package}-dev"]
+		} )
 
 		ensure_packages( [ 'php-pear' ], {
 			ensure  => latest,
