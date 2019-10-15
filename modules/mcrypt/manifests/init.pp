@@ -13,7 +13,7 @@ class mcrypt (
 
 	$php = $config[php]
 
-	if versioncmp( $php, '5.4') <= 0 {
+	if versioncmp( $php, '5.4' ) <= 0 {
 		$php_package = 'php5'
 	}
 	else {
@@ -23,42 +23,45 @@ class mcrypt (
 	# Mcyrpt isn't shipped in PHP 7.2 anymore but occasionally developers might need to still use it locally.
 	if versioncmp( $php, '5.4' ) >= 0 and versioncmp( $php, '7.2' ) >= 0 {
 		if ! defined( Package["php${config[php]}-dev"] ) {
-			package { "php${config[php]}-dev":
+			package { "${php_package}-dev":
 				ensure  => $package,
-				require => Package["php${config[php]}-fpm"]
+				require => [
+					Apt::Ppa['ppa:ondrej/php'],
+					Class['apt::update'],
+				]
 			}
 		}
 
 		if ! defined( Package['libmcrypt-dev'] ) {
 			package { 'libmcrypt-dev':
 				ensure  => $package,
-				require => Package["php${config[php]}-dev"]
+				require => Package["${php_package}-dev"]
 			}
 		}
 
-		if ! defined( Package['php-pear'] ) {
-			package { 'php-pear':
-			  ensure => installed,
-			}
-		}
+		ensure_packages( [ 'php-pear' ], {
+			ensure  => latest,
+			require => [
+				Package["${php_package}-dev"],
+				Package["${php_package}-xml"],
+			],
+		} )
 
-		if ! defined( Exec['pecl channel-update pecl.php.net'] ) {
-			exec { 'pecl channel-update pecl.php.net':
-				path    => '/usr/bin',
-				require => [
-					Package['php-pear'],
-					Package["${php_package}-xml"],
-					Package["${php_package}-dev"],
-				]
-			}
-		}
+		ensure_resource( 'exec', 'pecl channel-update pecl.php.net', {
+			path    => '/usr/bin',
+			require => [
+				Package['php-pear'],
+				Package["${php_package}-dev"],
+				Package["${php_package}-xml"],
+			],
+		} )
 
 		exec { 'pecl install mcrypt for PHP 7.2+':
 			path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
 			command => 'pecl install mcrypt-1.0.2',
 			require => [
 				Package['php-pear'],
-				Package["php${config[php]}-dev"],
+				Package["${php_package}-dev"],
 				Exec['pecl channel-update pecl.php.net'],
 			],
 			unless  => 'pecl info mcrypt-1.0.2',
@@ -68,14 +71,20 @@ class mcrypt (
 			ensure  => $file,
 			content => template('mcrypt/mcrypt.ini.erb'),
 			notify  => Service["${$php_package}-fpm"],
-			require => Exec[ 'pecl install mcrypt for PHP 7.2+' ],
+			require => [
+				Exec[ 'pecl install mcrypt for PHP 7.2+' ],
+				Package["${php_package}-cli"],
+			],
 		}
 
 		file { "/etc/php/${php}/fpm/conf.d/mcrypt.ini":
 			ensure  => $file,
 			content => template('mcrypt/mcrypt.ini.erb'),
 			notify  => Service["${$php_package}-fpm"],
-			require => Exec[ 'pecl install mcrypt for PHP 7.2+' ],
+			require => [
+				Exec[ 'pecl install mcrypt for PHP 7.2+' ],
+				Package["${php_package}-fpm"],
+			],
 		}
 
 	} else {
