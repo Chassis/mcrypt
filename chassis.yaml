@@ -5,3 +5,5 @@
 #
 # Values: 2
 version: 2
+# Mcrypt package version.
+mcrypt: 1.0.4
