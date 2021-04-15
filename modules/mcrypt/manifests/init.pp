@@ -12,6 +12,7 @@ class mcrypt (
 	}
 
 	$php = $config[php]
+	$mcrypt_version = $config[mcrypt]
 
 	if versioncmp( $php, '5.4' ) <= 0 {
 		$php_package = 'php5'
@@ -54,13 +55,13 @@ class mcrypt (
 
 		exec { 'pecl install mcrypt for PHP 7.2+':
 			path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
-			command => 'pecl install mcrypt-1.0.2',
+			command => "pecl install mcrypt-${mcrypt_version}",
 			require => [
 				Package['php-pear'],
 				Package["${php_package}-dev"],
 				Exec['pecl channel-update pecl.php.net'],
 			],
-			unless  => 'pecl info mcrypt-1.0.2',
+			unless  => "pecl info mcrypt-${mcrypt_version}",
 		}
 
 		file { "/etc/php/${php}/cli/conf.d/mcrypt.ini":
